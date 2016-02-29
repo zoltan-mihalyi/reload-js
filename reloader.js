@@ -21,11 +21,11 @@ function createRequire(require, relativeTo) {
             };
             try {
                 var fn = new Function('require,module,exports', content);
+                fn(createRequire(require, path.dirname(filepath)), module, module.exports);
             } catch (e) {
                 console.error(e + ' in file: ' + filepath);
                 return;
             }
-            fn(createRequire(require, path.dirname(filepath)), module, module.exports);
             return module.exports;
         }
 
