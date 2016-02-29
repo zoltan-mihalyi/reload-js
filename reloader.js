@@ -19,7 +19,12 @@ function createRequire(require, relativeTo) {
             var module = {
                 exports: {}
             };
-            var fn = new Function('require,module,exports', content);
+            try {
+                var fn = new Function('require,module,exports', content);
+            } catch (e) {
+                console.error(e + ' in file: ' + filepath);
+                return;
+            }
             fn(createRequire(require, path.dirname(filepath)), module, module.exports);
             return module.exports;
         }
