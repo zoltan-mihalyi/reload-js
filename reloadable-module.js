@@ -1,7 +1,9 @@
 function createFunctionProxy(module, path) {
-    return function () {
+    function proxy() {
         return module._paths[path].apply(this, arguments);
-    };
+    }
+
+    return proxy;
 }
 
 function ReloadableModule(initial) {
@@ -49,6 +51,11 @@ ReloadableModule.prototype.update = function (newObject) {
         if (isFunction(target)) {
             if (isFunction(obj)) {
                 createProxy(obj.prototype, target.prototype, path + '.prototype');
+            }
+        }
+        if (isObject(target)) {
+            if (isObject(obj)) {
+                target.__proto__ = createProxy(obj.__proto__, {}, path + '.__proto__'); //todo máshogy
             }
         }
         return target;
