@@ -63,3 +63,5 @@ reloadableModule.update(Person3);
 assertTrue(typeof ProxiedPerson.Person3 === 'function');
 assertEquals(ProxiedPerson.Person3, ProxiedPerson);
 
+/* EMPTY OBJECTS */
+reloadableModule.update(null);

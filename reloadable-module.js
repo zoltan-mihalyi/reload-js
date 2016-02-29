@@ -28,7 +28,7 @@ ReloadableModule.prototype.update = function (newObject) {
             } else if (isObject(obj)) {
                 target = {};
             }
-        } else { //nem létező propertyk pucolása
+        } else if (obj) { //nem létező propertyk pucolása
             for (i in target) {
                 if (target.hasOwnProperty(i) && !obj.hasOwnProperty(i)) {
                     delete target[i];
@@ -47,7 +47,9 @@ ReloadableModule.prototype.update = function (newObject) {
             }
         }
         if (isFunction(target)) {
-            createProxy(obj.prototype, target.prototype, path + '.prototype');
+            if (isFunction(obj)) {
+                createProxy(obj.prototype, target.prototype, path + '.prototype');
+            }
         }
         return target;
     }
