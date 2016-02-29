@@ -1,5 +1,5 @@
 {
-  "name": "reload",
+  "name": "reload-js",
   "version": "1.0.0",
   "description": "Reload js files without restarting the app!",
   "main": "reloader.js",
