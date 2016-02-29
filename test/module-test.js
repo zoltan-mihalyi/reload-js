@@ -92,7 +92,7 @@ Person4.prototype.method = function () {
 var reloadableModule2 = new ReloadableModule(Person4);
 var ProxiedPerson2 = reloadableModule2.getProxied();
 var p2 = new ProxiedPerson2();
-assertEquals(p2.x,1);
+assertEquals(p2.x, 1);
 assertEquals(p2.method(), 3);
 assertEquals(p2.baseMethod(), 2);
 
@@ -111,3 +111,15 @@ assertEquals(void 0, ProxiedPerson2.prototype.baseMethod);
 reloadableModule2.update(Person4);
 assertEquals(p2.method(), 3);
 assertEquals(p2.baseMethod(), 2);
+
+
+/* INSTANCEOF ORIGINAL */
+//console.log(p2.__proto__);
+assertTrue(p2 instanceof Person4);
+assertTrue(p2 instanceof Base);
+
+
+/* REPLACE ORIGINAL INSTANCEOF */
+reloadableModule2.update(function () {
+});
+assertTrue(!(p2 instanceof Person4));

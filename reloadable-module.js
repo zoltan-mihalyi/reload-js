@@ -51,6 +51,7 @@ ReloadableModule.prototype.update = function (newObject) {
         if (isFunction(target)) {
             if (isFunction(obj)) {
                 createProxy(obj.prototype, target.prototype, path + '.prototype');
+                insertToChain(target.prototype, obj.prototype);
             }
         }
         if (isObject(target)) {
@@ -64,6 +65,13 @@ ReloadableModule.prototype.update = function (newObject) {
     this._proxied = createProxy(newObject, this._proxied, '');
 };
 
+function insertToChain(proto, proto2) {
+    var next = proto;
+    while (next.__proto__.__proto__) {
+        next = next.__proto__;
+    }
+    next.__proto__ = proto2;
+}
 
 ReloadableModule.prototype.getProxied = function () {
     return this._proxied;
