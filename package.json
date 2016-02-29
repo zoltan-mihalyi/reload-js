@@ -1,0 +1,19 @@
+{
+  "name": "reload",
+  "version": "1.0.0",
+  "description": "Reload js files without restarting the app!",
+  "main": "reloader.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/module-test.js && node test/reloader-test.js"
+  },
+  "keywords": [
+    "reload",
+    "swap",
+    "replace"
+  ],
+  "author": "zoltan.mihalyi",
+  "license": "ISC"
+}
