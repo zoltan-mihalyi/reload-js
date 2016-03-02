@@ -1,1 +1,5 @@
+setTimeout(function(){
+        throw new Error('Timeout not cleared after reloading a module with error!');
+},1000);
+
 (null).x=1;

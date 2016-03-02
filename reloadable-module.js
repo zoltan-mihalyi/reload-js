@@ -6,15 +6,20 @@ function createFunctionProxy(module, path) {
     return proxy;
 }
 
-function ReloadableModule(initial) {
+function ReloadableModule(initial, cleanup) {
     this._paths = {};
-    this.update(initial);
+    this.update(initial, cleanup);
 }
 
-ReloadableModule.prototype.update = function (newObject) {
+ReloadableModule.prototype.update = function (newObject, cleanup) {
     var self = this;
     var added = [];
     var proxies = [];
+
+    if (this.cleanup) {
+        this.cleanup();
+    }
+    this.cleanup = cleanup;
 
     function createProxy(obj, target, path) {
         var i;

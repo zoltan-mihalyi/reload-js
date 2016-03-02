@@ -150,3 +150,15 @@ function B() {
 inherits(B, A);
 
 reloadableModule.update(B);
+
+
+/* CLEANUP */
+var called = false;
+
+reloadableModule.update(null, function () {
+    called = true;
+});
+
+assertTrue(!called);
+reloadableModule.update(null);
+assertTrue(called);
