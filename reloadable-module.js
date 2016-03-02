@@ -23,7 +23,6 @@ ReloadableModule.prototype.update = function (newObject) {
         if (index !== -1) {
             return proxies[index]; //todo shortest path to _paths
         }
-        console.log(path, obj);
         self._paths[path] = obj;
         if (!target) {
             if (typeof obj === 'function') {
