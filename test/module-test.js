@@ -162,3 +162,28 @@ reloadableModule.update(null, function () {
 assertTrue(!called);
 reloadableModule.update(null);
 assertTrue(called);
+
+/* OBJECTS AND PRIMITIVES */
+
+var objectModule = new ReloadableModule({
+    x: 1,
+    sub: {
+        a: 2
+    }
+});
+var obj = objectModule.getProxied();
+var subObj = obj.sub;
+
+assertEquals(1, obj.x);
+assertEquals(2, subObj.a);
+
+objectModule.update({
+    x: 2,
+    sub: {
+        a: 3
+    }
+});
+
+assertEquals(2, obj.x);
+assertEquals(3, obj.sub.a);
+assertEquals(3, subObj.a);

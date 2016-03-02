@@ -29,6 +29,11 @@ ReloadableModule.prototype.update = function (newObject, cleanup) {
             return proxies[index]; //todo shortest path to _paths
         }
         self._paths[path] = obj;
+
+        if (isPrimitive(obj)) {
+            return obj;
+        }
+
         if (!target) {
             if (typeof obj === 'function') {
                 target = createFunctionProxy(self, path);
@@ -78,6 +83,10 @@ function isObject(obj) {
 }
 function isFunction(obj) {
     return typeof obj === 'function';
+}
+function isPrimitive(obj) {
+    var s = typeof obj;
+    return obj === null || s === 'string' || s === 'number' || s === 'boolean' || s === 'undefined';
 }
 
 
