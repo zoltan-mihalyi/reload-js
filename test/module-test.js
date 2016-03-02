@@ -123,3 +123,30 @@ assertTrue(p2 instanceof Base);
 reloadableModule2.update(function () {
 });
 assertTrue(!(p2 instanceof Person4));
+
+
+/* 3 LEVEL INHERITANCE */
+function inherits(d, b) {
+    function Tmp() {
+    }
+
+    Tmp.prototype = b.prototype;
+
+    d.prototype = new Tmp();
+    //noinspection JSUnusedGlobalSymbols
+    d.prototype.constructor = d;
+}
+
+function X() {
+}
+
+function A() {
+}
+inherits(A, X);
+
+
+function B() {
+}
+inherits(B, A);
+
+reloadableModule.update(B);

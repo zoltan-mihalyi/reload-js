@@ -23,6 +23,7 @@ ReloadableModule.prototype.update = function (newObject) {
         if (index !== -1) {
             return proxies[index]; //todo shortest path to _paths
         }
+        console.log(path, obj);
         self._paths[path] = obj;
         if (!target) {
             if (typeof obj === 'function') {
@@ -51,12 +52,11 @@ ReloadableModule.prototype.update = function (newObject) {
         if (isFunction(target)) {
             if (isFunction(obj)) {
                 createProxy(obj.prototype, target.prototype, path + '.prototype');
-                insertToChain(target.prototype, obj.prototype);
             }
         }
         if (isObject(target)) {
             if (isObject(obj)) {
-                target.__proto__ = createProxy(obj.__proto__, {}, path + '.__proto__'); //todo máshogy
+                target.__proto__ = obj;
             }
         }
         return target;
@@ -64,14 +64,6 @@ ReloadableModule.prototype.update = function (newObject) {
 
     this._proxied = createProxy(newObject, this._proxied, '');
 };
-
-function insertToChain(proto, proto2) {
-    var next = proto;
-    while (next.__proto__.__proto__) {
-        next = next.__proto__;
-    }
-    next.__proto__ = proto2;
-}
 
 ReloadableModule.prototype.getProxied = function () {
     return this._proxied;
