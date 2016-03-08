@@ -187,3 +187,50 @@ objectModule.update({
 assertEquals(2, obj.x);
 assertEquals(3, obj.sub.a);
 assertEquals(3, subObj.a);
+
+/* UPDATE AFTER NULL */
+
+reloadableModule.update(null);
+
+function Person5() {
+}
+Person5.prototype.method5 = function () {
+    return 1;
+};
+
+reloadableModule.update(Person5);
+
+assertEquals(1, p.method5());
+
+/* OVERLOAD */
+
+function A1() {
+}
+
+A1.prototype.method = function () {
+    return 1;
+};
+
+function B1() {
+}
+inherits(B1, A1);
+
+reloadableModule = new ReloadableModule(B1);
+p = new (reloadableModule.getProxied())();
+assertEquals(1, p.method());
+
+function A2() {
+}
+
+A2.prototype.method = function () {
+    return 1;
+};
+
+function B2() {
+}
+inherits(B2, A2);
+B2.prototype.method = function () {
+    return 2;
+};
+reloadableModule.update(B2);
+assertEquals(2, p.method());
