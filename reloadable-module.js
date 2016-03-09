@@ -1,3 +1,19 @@
+function Context(added, proxies) {
+    this.added = added || [];
+    this.proxies = proxies || [];
+}
+Context.prototype.and = function (newObject, proxy) {
+    return new Context(this.added.concat(newObject), this.proxies.concat(proxy));
+};
+
+Context.prototype.getProxy = function (newObject) {
+    var index = this.added.indexOf(newObject);
+    if (index !== -1) {
+        return this.proxies[index];
+    }
+    return null;
+};
+
 function ReloadableModule(initial, cleanup) {
     this._objProxies = {};
     this._fnProxies = {};
@@ -16,16 +32,13 @@ ReloadableModule.prototype.update = function (newObject, cleanup) {
     }
     this.cleanup = cleanup;
 
-    this._currentProxy = this.createProxy(newObject, '', {
-        added: [],
-        proxies: []
-    });
+    this._currentProxy = this.createProxy(newObject, '', new Context());
 };
 
 ReloadableModule.prototype.createProxy = function (newObject, path, context) {
-    var index = context.added.indexOf(newObject);
-    if (index !== -1) {
-        return context.proxies[index];
+    var proxy = context.getProxy(newObject);
+    if (proxy) {
+        return proxy;
     }
     if (isObject(newObject)) {
         return this.createObjectProxy(newObject, path, context);
@@ -41,8 +54,6 @@ ReloadableModule.prototype.createObjectProxy = function (newObject, path, contex
         objProxy = this._objProxies[path] = {};
     }
 
-    context.added.push(newObject);
-    context.proxies.push(objProxy);
     this.syncProperties(objProxy, newObject, path, context);
 
     objProxy.__proto__ = newObject;
@@ -59,8 +70,6 @@ ReloadableModule.prototype.createFunctionProxy = function (newObject, path, cont
             return current[path].apply(this, arguments);
         };
     }
-    context.added.push(newObject);
-    context.proxies.push(fnProxy);
     this.syncProperties(fnProxy, newObject, path, context);
     return fnProxy;
 };
@@ -86,7 +95,7 @@ ReloadableModule.prototype.syncProperties = function (proxy, newObject, path, co
 
     for (i = 0; i < props.length; i++) {
         var prop = props[i];
-        proxy[prop] = this.createProxy(newObject[prop], path + '.' + prop, context);
+        proxy[prop] = this.createProxy(newObject[prop], path + '.' + prop, context.and(newObject, proxy));
     }
 };
 

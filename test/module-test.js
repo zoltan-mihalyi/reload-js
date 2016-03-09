@@ -234,3 +234,32 @@ B2.prototype.method = function () {
 };
 reloadableModule.update(B2);
 assertEquals(2, p.method());
+
+/* DUPLICATED REFERENCES */
+
+function x() {
+    return 1;
+}
+
+
+reloadableModule.update({
+    a: x,
+    b: x
+});
+
+var objProxied = reloadableModule.getProxied();
+
+var proxiedB = objProxied.b;
+
+assertTrue(proxiedB !== objProxied.a);
+
+assertEquals(1, objProxied.a());
+assertEquals(1, objProxied.b());
+
+reloadableModule.update({
+    b: function () {
+        return 2;
+    }
+});
+
+assertEquals(2, proxiedB());
