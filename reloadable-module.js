@@ -1,19 +1,3 @@
-function Context(added, proxies) {
-    this.added = added || [];
-    this.proxies = proxies || [];
-}
-Context.prototype.and = function (newObject, proxy) {
-    return new Context(this.added.concat(newObject), this.proxies.concat(proxy));
-};
-
-Context.prototype.getProxy = function (newObject) {
-    var index = this.added.indexOf(newObject);
-    if (index !== -1) {
-        return this.proxies[index];
-    }
-    return null;
-};
-
 function ReloadableModule(initial, cleanup) {
     this._objProxies = {};
     this._fnProxies = {};
@@ -32,49 +16,70 @@ ReloadableModule.prototype.update = function (newObject, cleanup) {
     }
     this.cleanup = cleanup;
 
-    this._currentProxy = this.createProxy(newObject, '', new Context());
+    this._currentProxy = new Context(this).createProxy(newObject);
 };
 
-ReloadableModule.prototype.createProxy = function (newObject, path, context) {
-    var proxy = context.getProxy(newObject);
+function Context(module, added, proxies, path) {
+    this.module = module;
+    this.added = added || [];
+    this.proxies = proxies || [];
+    this.path = path || '';
+}
+
+Context.prototype.and = function (newObject, proxy, prop) {
+    return new Context(this.module, this.added.concat(newObject), this.proxies.concat(proxy), this.path + '.' + prop);
+};
+
+Context.prototype.getProxy = function (newObject) {
+    var index = this.added.indexOf(newObject);
+    if (index !== -1) {
+        return this.proxies[index];
+    }
+    return null;
+};
+
+Context.prototype.createProxy = function (newObject) {
+    var proxy = this.getProxy(newObject);
     if (proxy) {
         return proxy;
     }
     if (isObject(newObject)) {
-        return this.createObjectProxy(newObject, path, context);
+        return this.createObjectProxy(newObject);
     } else if (isFunction(newObject)) {
-        return this.createFunctionProxy(newObject, path, context);
+        return this.createFunctionProxy(newObject);
     }
     return newObject;
 };
 
-ReloadableModule.prototype.createObjectProxy = function (newObject, path, context) {
-    var objProxy = this._objProxies[path];
+
+Context.prototype.createObjectProxy = function (newObject) {
+    var objProxy = this.module._objProxies[this.path];
     if (!objProxy) {
-        objProxy = this._objProxies[path] = {};
+        objProxy = this.module._objProxies[this.path] = {};
     }
 
-    this.syncProperties(objProxy, newObject, path, context);
+    this.syncProperties(objProxy, newObject);
 
     objProxy.__proto__ = newObject;
 
     return objProxy;
 };
 
-ReloadableModule.prototype.createFunctionProxy = function (newObject, path, context) {
-    this._currentByPath[path] = newObject;
-    var fnProxy = this._fnProxies[path];
+Context.prototype.createFunctionProxy = function (newObject) {
+    var path = this.path;
+    this.module._currentByPath[path] = newObject;
+    var fnProxy = this.module._fnProxies[path];
     if (!fnProxy) {
-        var current = this._currentByPath;
-        fnProxy = this._fnProxies[path] = function () {
+        var current = this.module._currentByPath;
+        fnProxy = this.module._fnProxies[path] = function () {
             return current[path].apply(this, arguments);
         };
     }
-    this.syncProperties(fnProxy, newObject, path, context);
+    this.syncProperties(fnProxy, newObject);
     return fnProxy;
 };
 
-ReloadableModule.prototype.syncProperties = function (proxy, newObject, path, context) {
+Context.prototype.syncProperties = function (proxy, newObject) {
     var i;
     for (i in proxy) {
         if (proxy.hasOwnProperty(i) && !newObject.hasOwnProperty(i)) {
@@ -95,7 +100,7 @@ ReloadableModule.prototype.syncProperties = function (proxy, newObject, path, co
 
     for (i = 0; i < props.length; i++) {
         var prop = props[i];
-        proxy[prop] = this.createProxy(newObject[prop], path + '.' + prop, context.and(newObject, proxy));
+        proxy[prop] = this.and(newObject, proxy, prop).createProxy(newObject[prop]);
     }
 };
 
