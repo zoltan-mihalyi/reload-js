@@ -27,7 +27,7 @@ function Context(module, added, proxies, path) {
 }
 
 Context.prototype.and = function (newObject, proxy, prop) {
-    return new Context(this.module, this.added.concat(newObject), this.proxies.concat(proxy), this.path + '.' + prop);
+    return new Context(this.module, concat(this.added, newObject), concat(this.added, proxy), this.path + '.' + prop);
 };
 
 Context.prototype.getProxy = function (newObject) {
@@ -110,6 +110,12 @@ function isObject(obj) {
 
 function isFunction(obj) {
     return typeof obj === 'function';
+}
+
+function concat(arr1, item) {
+    var result = arr1.slice();
+    result.push(item);
+    return result;
 }
 
 module.exports = ReloadableModule;

@@ -1,6 +1,6 @@
 {
   "name": "reload-js",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Reload js files without restarting the app!",
   "main": "reloader.js",
   "directories": {

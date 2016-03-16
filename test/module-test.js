@@ -163,8 +163,8 @@ assertTrue(!called);
 reloadableModule.update(null);
 assertTrue(called);
 
-/* OBJECTS AND PRIMITIVES */
 
+/* OBJECTS AND PRIMITIVES */
 var objectModule = new ReloadableModule({
     x: 1,
     sub: {
@@ -188,8 +188,8 @@ assertEquals(2, obj.x);
 assertEquals(3, obj.sub.a);
 assertEquals(3, subObj.a);
 
-/* UPDATE AFTER NULL */
 
+/* UPDATE AFTER NULL */
 reloadableModule.update(null);
 
 function Person5() {
@@ -202,8 +202,8 @@ reloadableModule.update(Person5);
 
 assertEquals(1, p.method5());
 
-/* OVERLOAD */
 
+/* OVERLOAD */
 function A1() {
 }
 
@@ -235,8 +235,8 @@ B2.prototype.method = function () {
 reloadableModule.update(B2);
 assertEquals(2, p.method());
 
-/* DUPLICATED REFERENCES */
 
+/* DUPLICATED REFERENCES */
 function x() {
     return 1;
 }
@@ -263,3 +263,21 @@ reloadableModule.update({
 });
 
 assertEquals(2, proxiedB());
+
+
+/* ARRAYS */
+reloadableModule = new ReloadableModule([{
+    a: 1
+}, {
+    a: 2
+}, {
+    a: 3
+}]);
+objProxied = reloadableModule.getProxied();
+
+assertEquals(3, objProxied.length);
+assertEquals(1, objProxied[0].a);
+assertEquals(2, objProxied[1].a);
+
+objProxied.push(12);
+assertEquals(12, objProxied[3]);
