@@ -1,0 +1,13 @@
+{
+  "exclude": [
+    "dist",
+    "test",
+    "bower_components",
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "module": "commonjs"
+  }
+}

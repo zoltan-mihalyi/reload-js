@@ -1,5 +1,5 @@
 var fs = require('fs');
-var reloader = require('./../reloader');
+var reloader = require('./../dist/node-reloader')(require);
 var asserts = require('./asserts');
 var assertEquals = asserts.assertEquals;
 var assertTrue = asserts.assertTrue;
@@ -15,7 +15,7 @@ var dynamicError2 = fs.readFileSync('test/sub/dynamic-error2.js.txt');
 var simple = 'module.exports = {};';
 
 fs.writeFileSync('test/sub/tmp/dynamic.js', dynamic1);
-var start = reloader(require, './sub/start');
+var start = reloader('./sub/start');
 fs.writeFileSync('test/sub/tmp/dynamic.js', simple); //clear timeouts
 assertEquals(1, start());
 

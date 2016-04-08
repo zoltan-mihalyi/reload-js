@@ -1,3 +1,6 @@
 /.idea
 /reload.iml
+/dist
+/bower_components
+/node_modules
 /test/sub/tmp

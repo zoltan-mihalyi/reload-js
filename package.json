@@ -1,12 +1,13 @@
 {
   "name": "reload-js",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Reload js files without restarting the app!",
-  "main": "reloader.js",
+  "main": "dist/node-reloader.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "prepublish": "node node_modules/typescript/bin/tsc",
     "test": "node test/module-test.js && node test/reloader-test.js"
   },
   "keywords": [
@@ -15,5 +16,8 @@
     "replace"
   ],
   "author": "zoltan.mihalyi",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^1.8.9"
+  }
 }

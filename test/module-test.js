@@ -1,4 +1,4 @@
-var ReloadableModule = require('./../reloadable-module');
+var ReloadableModule = require('./../dist/reloadable-module');
 var asserts = require('./asserts');
 var assertTrue = asserts.assertTrue;
 var assertEquals = asserts.assertEquals;
