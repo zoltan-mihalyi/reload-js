@@ -151,19 +151,6 @@ inherits(B, A);
 
 reloadableModule.update(B);
 
-
-/* CLEANUP */
-var called = false;
-
-reloadableModule.update(null, function () {
-    called = true;
-});
-
-assertTrue(!called);
-reloadableModule.update(null);
-assertTrue(called);
-
-
 /* OBJECTS AND PRIMITIVES */
 var objectModule = new ReloadableModule({
     x: 1,
