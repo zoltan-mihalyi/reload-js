@@ -4,15 +4,12 @@ class ReloadableSource {
     private _module:ReloadableModule;
     private _cleanup;
 
-    constructor(private _require, source:string) {
+    constructor(private _evaluate:(m:any, s:string) => any, source:string) {
         this.update(source);
     }
 
     update(source) {
-        var module = {
-            exports: {}
-        };
-
+        var result;
         var intervalProxy = createProxy(setInterval, clearInterval, false);
         var timeoutProxy = createProxy(setTimeout, clearTimeout, true);
 
@@ -26,20 +23,21 @@ class ReloadableSource {
         }
         this._cleanup = cleanup;
         try {
-            var fn = new Function('require,module,exports,setTimeout,clearTimeout,setInterval,clearInterval', source);
-            var result = fn(this._require, module, module.exports, timeoutProxy.start, timeoutProxy.stop, intervalProxy.start, intervalProxy.stop);
-            if (typeof result !== 'undefined') {
-                module.exports = result;
-            }
+            result = this._evaluate({
+                setTimeout: timeoutProxy.start,
+                clearTimeout: timeoutProxy.stop,
+                setInterval: intervalProxy.start,
+                clearInterval: intervalProxy.stop
+            }, source);
         } catch (e) {
             cleanup();
             throw e;
         }
 
         if (this._module) {
-            this._module.update(module.exports);
+            this._module.update(result);
         } else {
-            this._module = new ReloadableModule(module.exports);
+            this._module = new ReloadableModule(result);
         }
     }
 

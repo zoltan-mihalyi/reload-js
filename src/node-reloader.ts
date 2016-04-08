@@ -1,4 +1,5 @@
 ///<reference path="others.d.ts"/>
+import vm = require('vm');
 import fs = require('fs');
 import path = require('path');
 import ReloadableSource = require('./reloadable-source');
@@ -27,7 +28,27 @@ function createRequire(origRequire:Require, relativeTo?:string) {
             return sourceCache[filePath].getProxied();
         }
 
-        var module = new ReloadableSource(createRequire(origRequire, path.dirname(filePath)), fs.readFileSync(filePath));
+        function evaluate(locals:any, text) {
+            var module = {
+                exports: {}
+            };
+
+            locals.require = createRequire(origRequire, path.dirname(filePath));
+            locals.module = module;
+            locals.exports = module.exports;
+
+            var result = vm.runInNewContext(text, locals, {
+                filename: filePath,
+                lineOffset: 0
+            });
+
+            if (typeof result !== 'undefined') {
+                module.exports = result;
+            }
+            return module.exports;
+        }
+
+        var module = new ReloadableSource(evaluate, fs.readFileSync(filePath));
 
         watch(filePath, function (newContent) {
             try {
