@@ -5,16 +5,11 @@ class ReloadableModule {
     private _currentProxy = null;
     private _cleanup:() => void = null;
 
-    constructor(initial, cleanup?:() => void) {
-        this.update(initial, cleanup);
+    constructor(initial) {
+        this.update(initial);
     }
 
-    update(newObject, cleanup?:() => void) {
-        if (this._cleanup) {
-            this._cleanup();
-        }
-        this._cleanup = cleanup;
-
+    update(newObject) {
         this._currentProxy = new Context(this).createProxy(newObject);
     }
 

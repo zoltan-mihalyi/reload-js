@@ -2,6 +2,7 @@ import ReloadableModule = require("./reloadable-module");
 
 class ReloadableSource {
     private _module:ReloadableModule;
+    private _cleanup;
 
     constructor(private _require, source:string) {
         this.update(source);
@@ -20,6 +21,10 @@ class ReloadableSource {
             timeoutProxy.cleanup();
         }
 
+        if (this._cleanup) {
+            this._cleanup();
+        }
+        this._cleanup = cleanup;
         try {
             var fn = new Function('require,module,exports,setTimeout,clearTimeout,setInterval,clearInterval', source);
             var result = fn(this._require, module, module.exports, timeoutProxy.start, timeoutProxy.stop, intervalProxy.start, intervalProxy.stop);
@@ -32,17 +37,17 @@ class ReloadableSource {
         }
 
         if (this._module) {
-            this._module.update(module.exports, cleanup);
+            this._module.update(module.exports);
         } else {
-            this._module = new ReloadableModule(module.exports, cleanup);
+            this._module = new ReloadableModule(module.exports);
         }
     }
 
     getModule() {
         return this._module;
     }
-    
-    getProxied(){
+
+    getProxied() {
         return this._module.getProxied();
     }
 }
