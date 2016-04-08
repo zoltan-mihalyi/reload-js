@@ -36,11 +36,23 @@ function createRequire(origRequire:Require, relativeTo?:string) {
             locals.require = createRequire(origRequire, path.dirname(filePath));
             locals.module = module;
             locals.exports = module.exports;
+            locals.__dirname = path.dirname(filePath);
+            locals.__filename = filePath;
 
-            var result = vm.runInNewContext(text, locals, {
+            var localParams = [];
+            var localObjects = [];
+            for (var i in locals) {
+                if (locals.hasOwnProperty(i)) {
+                    localParams.push(i);
+                    localObjects.push(locals[i]);
+                }
+            }
+
+            var fn = (vm.runInThisContext('(function(' + localParams.join(',') + '){' + text + '})', {
                 filename: filePath,
                 lineOffset: 0
-            });
+            }));
+            var result = fn.apply(null, localObjects);
 
             if (typeof result !== 'undefined') {
                 module.exports = result;
