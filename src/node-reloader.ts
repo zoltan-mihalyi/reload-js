@@ -48,7 +48,7 @@ function createRequire(origRequire:Require, relativeTo?:string) {
                 }
             }
 
-            var fn = (vm.runInThisContext('(function(' + localParams.join(',') + '){' + text + '})', {
+            var fn = (vm.runInThisContext('(function(' + localParams.join(',') + '){' + text + '\n})', {
                 filename: filePath,
                 lineOffset: 0
             }));
