@@ -1,9 +1,11 @@
+var toString = Function.prototype.toString;
+
 class ReloadableModule {
     private _objProxies:{[idx:string]:any} = {};
     private _fnProxies = {};
+    private _classProxies = {};
     private _currentByPath = {};
     private _currentProxy = null;
-    private _cleanup:() => void = null;
 
     constructor(initial) {
         this.update(initial);
@@ -36,6 +38,21 @@ class ReloadableModule {
         }
         return fnProxy;
     }
+
+    _getClassProxy(path:string, newObject:any) {
+        this._currentByPath[path] = newObject;
+        var classProxy = this._classProxies[path];
+        if (!classProxy) {
+            var current = this._currentByPath;
+
+            classProxy = this._classProxies[path] = function proxy() {
+                var result = new (Function.prototype.bind.apply(current[path], [null].concat(Array.prototype.slice.call(arguments, 0))));
+                result.__proto__ = classProxy.prototype;
+                return result;
+            };
+        }
+        return classProxy;
+    }
 }
 
 class Context {
@@ -66,6 +83,9 @@ class Context {
         if (isObject(newObject)) {
             return this.createObjectProxy(newObject);
         } else if (isFunction(newObject)) {
+            if (isClass(newObject)) {
+                return this.createClassProxy(newObject);
+            }
             return this.createFunctionProxy(newObject);
         }
         return newObject;
@@ -85,6 +105,12 @@ class Context {
         var fnProxy = this.module._getFunctionProxy(this.path, newObject);
         this.syncProperties(fnProxy, newObject);
         return fnProxy;
+    }
+
+    createClassProxy(newObject) {
+        var classProxy = this.module._getClassProxy(this.path, newObject);
+        this.syncProperties(classProxy, newObject);
+        return classProxy;
     }
 
     syncProperties(proxy, newObject) {
@@ -119,6 +145,10 @@ function isObject(obj) {
 
 function isFunction(obj) {
     return typeof obj === 'function';
+}
+
+function isClass(obj) {
+    return typeof obj === 'function' && toString.call(obj).indexOf('class') === 0;
 }
 
 function concat(arr1, item) {
