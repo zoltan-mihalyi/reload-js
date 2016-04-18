@@ -17,7 +17,8 @@ var simple = 'module.exports = {};';
 fs.writeFileSync('test/sub/tmp/dynamic.js', dynamic1);
 var start = reloader('./sub/start');
 fs.writeFileSync('test/sub/tmp/dynamic.js', simple); //clear timeouts
-assertEquals(1, start());
+assertEquals(1, start.dynamic());
+assertEquals("test", start.json.data);
 
 function step1() {
     fs.writeFileSync('test/sub/tmp/dynamic.js', dynamicError);
@@ -33,7 +34,7 @@ function step3() {
     setTimeout(step4, 500);
 }
 function step4() {
-    assertTrue(start() > 1000); //interval and timeout works
+    assertTrue(start.dynamic() > 1000); //interval and timeout works
     fs.writeFileSync('test/sub/tmp/dynamic.js', simple); //stop intervals
     console.log('DONE');
 }

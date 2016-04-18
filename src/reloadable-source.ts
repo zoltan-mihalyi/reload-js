@@ -1,14 +1,14 @@
 import ReloadableModule = require("./reloadable-module");
+import AbstractReloadableSource = require("./abstract-reloadable-source");
 
-class ReloadableSource {
-    private _module:ReloadableModule;
+class ReloadableSource extends AbstractReloadableSource{
     private _cleanup;
 
     constructor(private _evaluate:(m:any, s:string) => any, source:string) {
-        this.update(source);
+        super(source);
     }
 
-    update(source) {
+    protected evaluate(source) {
         var result;
         var intervalProxy = createProxy(setInterval, clearInterval, false);
         var timeoutProxy = createProxy(setTimeout, clearTimeout, true);
@@ -33,20 +33,7 @@ class ReloadableSource {
             cleanup();
             throw e;
         }
-
-        if (this._module) {
-            this._module.update(result);
-        } else {
-            this._module = new ReloadableModule(result);
-        }
-    }
-
-    getModule() {
-        return this._module;
-    }
-
-    getProxied() {
-        return this._module.getProxied();
+        return result;
     }
 }
 
