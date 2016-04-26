@@ -13,6 +13,11 @@ class ReloadableModule {
 
     update(newObject) {
         this._currentProxy = new Context(this).createProxy(newObject);
+        for (var i in this._currentProxy) {
+            if (this._currentProxy.hasOwnProperty(i)) {
+                newObject[i] = this._currentProxy[i];
+            }
+        }
     }
 
     getProxied() {

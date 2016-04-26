@@ -268,3 +268,35 @@ assertEquals(2, objProxied[1].a);
 
 objProxied.push(12);
 assertEquals(12, objProxied[3]);
+
+
+/* ACCESS PROXIED INSIDE MODULE */
+var exp = {
+    Holder:Holder
+};
+
+function Holder(value){
+    this.value = value;
+}
+
+Holder.create=function(){
+    return new exp.Holder(42);
+};
+
+reloadableModule = new ReloadableModule(exp);
+objProxied = reloadableModule.getProxied();
+
+var holder = objProxied.Holder.create();
+
+function Holder2() {
+}
+Holder2.prototype.increment=function(){
+    this.value++;
+};
+
+reloadableModule.update({
+    Holder:Holder2
+});
+
+holder.increment();
+assertEquals(43,holder.value);
